@@ -136,3 +136,104 @@ def Limpiar(clients):
             sin_acentos=""
     print("Lista limpia de clientes al realizar todas las operaciones:")
     return DatosLimpios
+
+
+
+
+
+# EJERCICIO 10: 
+""" 
+    ARRANQUE DE EJERCICIO 10:
+"""
+def inicializo(rounds):
+    # Inicializar estadísticas totales de cada jugador
+    jugadores = ['Shadow', 'Blaze', 'Viper', 'Frost', 'Reaper']
+    total = {
+        jugador: {
+            'kills': 0,
+            'assists': 0,
+            'deaths': 0,
+            'puntos': 0,
+            'mvp_count': 0
+        } for jugador in jugadores
+    }
+    return total
+
+def actualizar_estadisticas(stats, stats_ronda, mvp):
+    ronda = []
+
+    for jugador in stats_ronda:
+        stats[jugador]['kills'] += stats_ronda[jugador]['kills']
+        stats[jugador]['assists'] += stats_ronda[jugador]['assists']
+        stats[jugador]['deaths'] += stats_ronda[jugador]['deaths']
+        stats[jugador]['puntos'] += stats_ronda[jugador]['puntos']
+        
+        if jugador == mvp:
+            stats[jugador]['mvp_count'] += 1
+
+        ronda.append({
+            'Nombre': jugador,
+            'Kills': stats[jugador]['kills'],
+            'Assists': stats[jugador]['assists'],
+            'Death': stats[jugador]['deaths'],
+            'MVP': stats[jugador]['mvp_count'],
+            'Puntos': stats[jugador]['puntos']
+        })
+    return ronda
+
+#Utilizo sorted para ordenar lista de mayor a menor 
+def ordenar(ronda):
+    return sorted(ronda, key=lambda jugador: jugador['Puntos'], reverse=True)
+
+
+def imprimir(ronda):
+    print("| Jugador   | Kills | Asistencias | Muertes | MVP  | Puntos |")
+    print("-" * 59)
+    
+    for fila in ronda:
+        print(
+            f"| {fila['Nombre']:<10}| {fila['Kills']:<6}| {fila['Assists']:<11}| "
+            f"{fila['Death']:<6}| {fila['MVP']:<6}| {fila['Puntos']:<6}|"
+        )
+        print("-" * 59)
+
+
+def calcular_puntos_y_mvp(round_data):
+    stats_ronda = {}
+    max_puntos = -1
+    mvp = None
+
+    for jugador, stats in round_data.items():
+        kills = stats['kills']
+        assists = stats['assists']
+        deaths = 1 if stats['deaths'] else 0
+
+        puntos = (kills * 3) + assists - deaths
+
+        stats_ronda[jugador] = {
+            'kills': kills,
+            'assists': assists,
+            'deaths': deaths,
+            'puntos': puntos
+        }
+        #calculo mvp
+        if puntos > max_puntos:
+            max_puntos = puntos
+            mvp = jugador
+
+    return stats_ronda, mvp
+
+#Modulo donde invocare mis funciones para trabajar.
+
+def ranking(rounds):
+    stats= inicializo(rounds)
+    ronda_num=1
+    for ronda_actual in rounds:
+        print(f"Ranking ronda {ronda_num if ronda_num < 5 else 'Final'}")
+        
+        stats_ronda, mvp = calcular_puntos_y_mvp(ronda_actual)
+        ronda = actualizar_estadisticas(stats, stats_ronda, mvp)
+        ronda_ordenada = ordenar(ronda)
+        imprimir(ronda_ordenada)
+
+        ronda_num += 1
